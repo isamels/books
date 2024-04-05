@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>books!</title>
+    <link href="https://fonts.googleapis.com/css?family=Righteous" rel="stylesheet">
+</head>
+<body>
+    <!--state game rules-->
+    <h1>books!</h1>
+    <div class="container">
+        <p>Use ↑ and ↓ to switch between bookshelves, → to pick up a book and ← to place it.</p>
+        <p>You may only hold <strong>one</strong> book at a time, and each book on the shelves must be smaller than those to its left.</p>
+        <p>Arrange all the books into one bookshelf accordingly.</p>
+    </div>
+
+    <svg class="container">
+        <rect id="shelf1" x="6vw" y="2vh" width="18vw" height="22vh" rx="0.3vw" stroke="rgb(153, 51, 51)" stroke-width="3" stroke-opacity="0"></rect>
+        <rect id="shelf1a" x="7vw" y="4vh" width="16vw" height="18vh"></rect>
+        <rect id="shelf2" x="6vw" y="28vh" width="18vw" height="22vh" rx="0.3vw" stroke="rgb(153, 51, 51)" stroke-width="3" stroke-opacity="0"></rect>
+        <rect id="shelf2a" x="7vw" y="30vh" width="16vw" height="18vh"></rect>
+        <rect id="shelf3" x="6vw" y="54vh" width="18vw" height="22vh" rx="0.3vw" stroke="rgb(153, 51, 51)" stroke-width="3" stroke-opacity="0"></rect>
+        <rect id="shelf3a" x="7vw" y="56vh" width="16vw" height="18vh"></rect>
+    </svg>
+
+    <input class="container" id="undoButton" type="button" value="Undo" onclick="undo()"/>
+
+    <style>
+        body {
+            background-color: rgb(223, 206, 195);
+        }
+
+        h1, div {
+            font-family: 'Righteous', sans-serif;
+            line-height: 5vh;
+        }
+
+        h1 {
+            color: rgb(153, 51, 51);
+            font-size: 10vh;
+            text-align: center;
+        }
+
+        div {
+            color: rgb(0, 0, 0);
+            width: 26vw;
+            margin-left: 5vw;
+            margin-top: 12vh;
+            text-align: center;
+        }
+
+        p {
+            font-size: 3vh;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        svg {
+            position: absolute;
+            top: 19vh;
+            left: 29vw; /* Adjust the left position as needed */
+            width: 70vw; /* Adjust the width as needed */
+            height: 80vh;
+            /*outline: 2px solid rgb(95, 34, 209);*/
+            margin-left: 0.5vw;
+        }
+
+        #shelf1, #shelf2, #shelf3 {
+            fill: rgb(81, 57, 55);
+        }
+
+        #shelf1a, #shelf2a, #shelf3a {
+            fill: rgb(134, 105, 101);
+        }
+
+        #book {
+            fill: rgb(100, 8, 153);
+            stroke: black;
+            stroke-width: 2;
+        }
+
+        #undoButton {
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 12px 12px;
+            left: 50vh;
+            background-color: rgb(223, 206, 195);
+            font-family: 'Righteous', sans-serif;
+            text-align: center;
+            font-size: 30px;
+        }
+    </style>
+
+    <script>
+        var n = 6; //# of books
+
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+        function draw(rect, n, shelf, place){
+            rect.setAttribute("x", 7+place*2+"vw"); //place of book
+            rect.setAttribute("y", 20-n*2+shelf*26+"vh"); //nth book height & shelf
+            rect.setAttribute("width", "2vw"); //always 2
+            rect.setAttribute("height", (n+1)*2+"vh"); //nth book height
+            var col = 255-n*28;
+            rect.setAttribute("fill", "rgb(" + col + ", " + col + ", " + col + ")");
+            rect.setAttribute("stroke", "black");
+            rect.setAttribute("stroke-width", "2");
+            svg.appendChild(rect);
+        }
+
+        //initiate bookshelf arrays
+        var shelf1 = [];
+        var shelf2 = [];
+        var shelf3 = [];
+        var books1 = [];
+        var books2 = [];
+        var books3 = [];
+
+        //generate problem
+        function generate(n){
+            var place = 0;
+            for(var i = n; i > 0; i--){
+                var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                place = Math.floor(Math.random() * 3);
+                if(place == 0){
+                    draw(rect, i, place, shelf1.length);
+                    books1.push(rect);
+                    shelf1.push(i);
+                }else if(place == 1){
+                    draw(rect, i, place, shelf2.length);
+                    books2.push(rect);
+                    shelf2.push(i);
+                }else if(place == 2){
+                    draw(rect, i, place, shelf3.length);
+                    books3.push(rect);
+                    shelf3.push(i);
+                }
+            }
+        }
+
+        generate(n);
+
+        document.body.appendChild(svg);
+
+        //arrow key movement
+        var current = 0;
+        var hold = false;
+        var moves = 0;
+        var trackMoves = [];
+        var prev = 0; //shelf current book was taken from
+        var undoing = false;
+        var winned = false;
+
+        //select current bookshelf
+        function select(n){
+            n++;
+            var select = document.getElementById("shelf" + n);
+            select.setAttribute("stroke-opacity", "1");
+        }
+
+        function unSelect(n){
+            n++;
+            var select = document.getElementById("shelf" + n);
+            select.setAttribute("stroke-opacity", "0");
+        }
+
+        select(0);
+
+        //show moves
+        var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+        function showMoves(moves){
+            text.setAttribute("x", "40vw");
+            text.setAttribute("y", "10vh");
+            text.setAttribute("font-size", "6vh");
+            text.setAttribute("font-family", "Righteous");
+            text.textContent = "Moves: " + moves;
+            svg.appendChild(text);
+        }
+
+        showMoves(moves);
+
+        //arrow key movement
+        function moveUp(){
+            if(current > 0){
+                if(hold){
+                    if(current == 1){
+                        var book = books2[books2.length-1];
+                        books1.push(book);
+                        books2.pop();
+                    }else{
+                        var book = books3[books3.length-1];
+                        books2.push(book);
+                        books3.pop();
+                    }
+                    var y = parseInt(book.getAttribute("y").replace("vh","")) - 26;
+                    book.setAttribute("y", y + "vh");
+                }
+                unSelect(current);
+                current--;
+                select(current);
+            }
+        }
+
+        function moveDown(){
+            if(current < 2){
+                if(hold){
+                    if(current == 0){
+                        var book = books1[books1.length-1];
+                        books2.push(book);
+                        books1.pop();
+                    }else{
+                        var book = books2[books2.length-1];
+                        books3.push(book);
+                        books2.pop();
+                    }
+                    var y = parseInt(book.getAttribute("y").replace("vh","")) + 26;
+                    book.setAttribute("y", y + "vh");
+                }
+                unSelect(current);
+                current++;
+                select(current);
+            }
+        }
+
+        function moveRight(){
+            if(!hold){
+                if(current == 0){
+                    var book = books1[books1.length-1];
+                }else if(current == 1){
+                    var book = books2[books2.length-1];
+                }else{
+                    var book = books3[books3.length-1];
+                }
+                var x = 27;
+                book.setAttribute("x", x + "vw");
+                hold = true;
+                prev = current;
+            }
+        }
+
+        function moveLeft(){
+            if(hold){
+                if(current == 0){
+                    var book = books1[books1.length-1];
+                    if(books1.length > 1){
+                        var bookLeft = books1[books1.length-2];
+                    }else{
+                        var bookLeft = book;
+                    }
+                    var x = 7 + (books1.length*2-2);
+                }else if(current == 1){
+                    var book = books2[books2.length-1];
+                    if(books2.length > 1){
+                        var bookLeft = books2[books2.length-2];
+                    }else{
+                        var bookLeft = book;
+                    }
+                    var x = 7 + (books2.length*2-2);
+                }else{
+                    var book = books3[books3.length-1];
+                    if(books3.length > 1){
+                        var bookLeft = books3[books3.length-2];
+                    }else{
+                        var bookLeft = book;
+                    }
+                    var x = 7 + (books3.length*2-2);
+                }
+                //only if the book to the left is larger
+                var height1 = parseInt(book.getAttribute("height").replace("vh",""));
+                var height2 = parseInt(bookLeft.getAttribute("height").replace("vh",""));
+                if(undoing){
+                    book.setAttribute("x", x + "vw");
+                }else if(height1 <= height2 || undoing){
+                    book.setAttribute("x", x + "vw");
+                    hold = false;
+                    moves++;
+                    showMoves(moves);
+                    trackMoves.push(prev + " " + current);
+                    console.log(trackMoves);
+                }
+                //you won!
+                if(books1.length == n || books2.length == n || books3.length == n){
+                    win();
+                }
+            }
+        }
+        function undo(){
+            if(moves > 0){
+                undoing = true;
+                moves--;
+                showMoves(moves);
+                var recent = trackMoves[trackMoves.length-1];
+                //console.log(recent);
+                var a = parseInt(recent[0]);
+                var b = parseInt(recent[2]);
+                //console.log(hold);
+                if(hold){
+                    while(current > prev){
+                        moveUp();
+                    }
+                    while(current < prev){
+                        moveDown();
+                    }
+                    moveLeft();
+                }
+                unSelect(current);
+                current = b;
+                select(current);
+                hold = true;
+                if(b < a){ //move down
+                    while(current < a){
+                        moveDown();
+                        moveLeft();
+                    }
+                }else if(b > a){ //move up
+                    while(current > a){
+                        moveUp();
+                        moveLeft();
+                    }
+                } //otherwise move on the spot
+                hold = false;
+                undoing = false;
+                trackMoves.pop();
+                console.log(trackMoves);
+            }
+        }
+
+        function win(){
+            var winScreen = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            winScreen.setAttribute("x", "35vw");
+            winScreen.setAttribute("y", "40vh");
+            winScreen.setAttribute("font-size", "10vh");
+            winScreen.setAttribute("font-family", "Righteous");
+            winScreen.setAttribute("fill", "rgb(51, 102, 0)");
+            winScreen.textContent = "you won!";
+            svg.appendChild(winScreen);
+            document.onkeydown = null;
+        }
+
+        document.onkeydown = checkKey;
+
+        function checkKey(e) {
+            e = e || window.event;
+            if (e.keyCode == '38') {
+                moveUp();
+            }
+            else if (e.keyCode == '40') {
+                moveDown();
+            }
+            else if (e.keyCode == '37') {
+                moveLeft();
+            }
+            else if (e.keyCode == '39') {
+            moveRight();
+            }
+        }
+
+
+
+        document.body.appendChild(svg);
+
+        //solve function
+        function solve(a, b, c, m, moves){
+            if(!c.includes(m)){
+                if(m-1 > 0){
+                    if(a.includes(m-1)){
+                        moves = solve(a, c, b, m-1, moves);
+                    }else if(c.includes(m-1)){
+                        moves = solve(c, a, b, m-1, moves);
+                    }else if(b.includes(m-1)){
+                        if(a.includes(m-2)){
+                            moves = solve(c, a, b, m-1, moves);
+                        }else{
+                            moves = solve(a, c, b, m-1, moves);
+                        }
+                    }
+                }
+
+                c.push(a[a.length - 1]);
+                a.pop();
+                moves++;
+            }
+            if(m-1 > 0){
+                if(c.includes(m) && a.includes(m-1)){
+                    moves = solve(a, b, c, m-1, moves);
+                }else{
+                    moves = solve(b, a, c, m-1, moves);
+                }
+            }
+            return moves;
+        }
+    </script>
+</body>
+</html>

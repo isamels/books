@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>books!</title>
+    <link rel="stylesheet" href="styles.css"> <!--reference to styling css script-->
+    <link href="https://fonts.googleapis.com/css?family=Righteous" rel="stylesheet"> <!--grab "righteous" font from google library-->
+</head>
+<body>
+    <!--state game rules-->
+    <h1>books!</h1>
+    <div class="container">
+        <p>Use ↑ and ↓ to switch between bookshelves, → to pick up a book and ← to place it.</p>
+        <p>You may only hold <strong>one</strong> book at a time, and each book on the shelves must be smaller than those to its left.</p>
+        <p>Arrange all the books into one bookshelf accordingly.</p>
+        <p id="undo">(Ctrl + Z to undo)</p>
+    </div>
+
+    <svg class="container">
+        <rect id="shelf1" x="6vw" y="2vh" width="18vw" height="22vh" rx="0.3vw" stroke="rgb(153, 51, 51)" stroke-width="3" stroke-opacity="0"></rect>
+        <rect id="shelf1a" x="7vw" y="4vh" width="16vw" height="18vh"></rect>
+        <rect id="shelf2" x="6vw" y="28vh" width="18vw" height="22vh" rx="0.3vw" stroke="rgb(153, 51, 51)" stroke-width="3" stroke-opacity="0"></rect>
+        <rect id="shelf2a" x="7vw" y="30vh" width="16vw" height="18vh"></rect>
+        <rect id="shelf3" x="6vw" y="54vh" width="18vw" height="22vh" rx="0.3vw" stroke="rgb(153, 51, 51)" stroke-width="3" stroke-opacity="0"></rect>
+        <rect id="shelf3a" x="7vw" y="56vh" width="16vw" height="18vh"></rect>
+    </svg>
+
+    <script src="script.js"></script> <!--reference javascript for moving canvas shapes & game behaviour-->
+</body>
+</html>

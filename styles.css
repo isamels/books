@@ -1,0 +1,61 @@
+body {
+    background-color: rgb(223, 206, 195);
+}
+
+h1, div {
+    font-family: 'Righteous', sans-serif;
+    line-height: 5vh;
+}
+
+h1 {
+    color: rgb(153, 51, 51);
+    font-size: 10vh;
+    text-align: center;
+}
+
+div {
+    color: rgb(0, 0, 0);
+    width: 26vw;
+    margin-left: 5vw;
+    margin-top: 12vh;
+    text-align: center;
+}
+
+p {
+    font-size: 3vh;
+    margin-bottom: 20px;
+}
+
+#undo{
+    font-size: 2.5vh;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+svg {
+    position: absolute;
+    top: 19vh;
+    left: 29vw; /* Adjust the left position as needed */
+    width: 70vw; /* Adjust the width as needed */
+    height: 80vh;
+    /*outline: 2px solid rgb(95, 34, 209);*/
+    margin-left: 0.5vw;
+}
+
+#shelf1, #shelf2, #shelf3 {
+    fill: rgb(81, 57, 55);
+}
+
+#shelf1a, #shelf2a, #shelf3a {
+    fill: rgb(134, 105, 101);
+}
+
+#book {
+    fill: rgb(100, 8, 153);
+    stroke: black;
+    stroke-width: 2;
+}
