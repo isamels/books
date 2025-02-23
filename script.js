@@ -269,9 +269,9 @@ function win(){
     winScreen.setAttribute("font-family", "Righteous");
     winScreen.setAttribute("fill", "rgb(51, 102, 0)");
     if(moves == target){
-        winScreen.textContent = "YIPPEE!";
+        winScreen.textContent = "Flawless! You must sort books for breakfast.";
     }else{
-        winScreen.textContent = "you won!";
+        winScreen.textContent = "Congrats! You might have taken the scenic route, but you made it.";
     }
     svg.appendChild(winScreen);
     document.onkeydown = null;
