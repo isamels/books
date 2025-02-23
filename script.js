@@ -101,6 +101,7 @@ min.setAttribute("x", "44vw");
 min.setAttribute("y", "14vh");
 min.setAttribute("font-size", "3vh");
 min.setAttribute("font-family", "Righteous");
+min.setAttribute("fill", "rgb(230, 220, 210)");
 min.textContent = "Target: " + target;
 svg.appendChild(min);
 
@@ -273,7 +274,7 @@ function win(){
         winScreen.setAttribute("fill", "rgb(206, 125, 95)");
     }else{
         winScreen.textContent = "Congrats! You might have taken the scenic route, but you made it.";
-        winScreen.setAttribute("fill", "rgb(82, 81, 81)");
+        winScreen.setAttribute("fill", "rgb(230, 220, 210)");
     }
     svg.appendChild(winScreen);
     document.onkeydown = null;

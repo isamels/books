@@ -1,5 +1,5 @@
 body {
-    background-color: rgb(248, 247, 244);
+    background-color: rgb(221, 193, 167);
 }
 
 h1, div {
@@ -47,11 +47,11 @@ svg {
 }
 
 #shelf1, #shelf2, #shelf3 {
-    fill: rgb(161, 122, 96);
+    fill: rgb(116, 94, 77);
 }
 
 #shelf1a, #shelf2a, #shelf3a {
-    fill: rgb(221, 193, 167);
+    fill: rgb(161, 122, 96);
 }
 
 #book {
