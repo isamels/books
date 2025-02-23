@@ -7,8 +7,8 @@ function draw(rect, n, shelf, place){
     rect.setAttribute("y", 20-n*2+shelf*26+"vh"); //nth book height & shelf
     rect.setAttribute("width", "2vw"); //always 2
     rect.setAttribute("height", (n+1)*2+"vh"); //nth book height
-    var col = 255-n*28;
-    rect.setAttribute("fill", "rgb(" + col + ", " + col + ", " + col + ")");
+    var col = 130-n*15;//(139, 125, 95)
+    rect.setAttribute("fill", "rgb(139," + (col+2*n) + ", " + col + ")");
     rect.setAttribute("stroke", "black");
     rect.setAttribute("stroke-width", "2");
     svg.appendChild(rect);
@@ -101,7 +101,7 @@ min.setAttribute("x", "44vw");
 min.setAttribute("y", "14vh");
 min.setAttribute("font-size", "3vh");
 min.setAttribute("font-family", "Righteous");
-min.setAttribute("fill", "rgb(230, 220, 210)");
+min.setAttribute("fill", "rgb(206, 125, 95)");
 min.textContent = "Target: " + target;
 svg.appendChild(min);
 
@@ -265,17 +265,29 @@ function undo(){
 
 function win(){
     var winScreen = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    var secondLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
     winScreen.setAttribute("x", "37vw");
     winScreen.setAttribute("y", "40vh");
+    secondLine.setAttribute("x", "31vw");
+    secondLine.setAttribute("dy", "1.5em");
     winScreen.setAttribute("font-size", "10vh");
+    secondLine.setAttribute("font-size", "4vh");
     winScreen.setAttribute("font-family", "Righteous");
     if(moves == target){
-        winScreen.textContent = "Flawless! You must sort books for breakfast.";
+        winScreen.textContent = "Flawless!";
+        secondLine.textContent = "You must sort books for breakfast.";
         winScreen.setAttribute("fill", "rgb(206, 125, 95)");
     }else{
-        winScreen.textContent = "Congrats! You might have taken the scenic route, but you made it.";
+        winScreen.textContent = "Congrats!";
+        secondLine.textContent = "You might have taken the scenic route,";
         winScreen.setAttribute("fill", "rgb(230, 220, 210)");
+        var thirdLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        thirdLine.setAttribute("x", "41vw");
+        thirdLine.setAttribute("dy", "1.5em");
+        thirdLine.textContent = "but you made it.";
+        secondLine.appendChild(thirdLine);
     }
+    winScreen.appendChild(secondLine);
     svg.appendChild(winScreen);
     document.onkeydown = null;
 }
