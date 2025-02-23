@@ -109,6 +109,7 @@ function showMoves(moves){
     text.setAttribute("y", "10vh");
     text.setAttribute("font-size", "6vh");
     text.setAttribute("font-family", "Righteous");
+    text.setAttribute("fill", "rgb(116, 94, 77)");
     text.textContent = "Moves: " + moves;
     svg.appendChild(text);
 }
@@ -267,11 +268,12 @@ function win(){
     winScreen.setAttribute("y", "40vh");
     winScreen.setAttribute("font-size", "10vh");
     winScreen.setAttribute("font-family", "Righteous");
-    winScreen.setAttribute("fill", "rgb(51, 102, 0)");
     if(moves == target){
         winScreen.textContent = "Flawless! You must sort books for breakfast.";
+        winScreen.setAttribute("fill", "rgb(206, 125, 95)");
     }else{
         winScreen.textContent = "Congrats! You might have taken the scenic route, but you made it.";
+        winScreen.setAttribute("fill", "rgb(82, 81, 81)");
     }
     svg.appendChild(winScreen);
     document.onkeydown = null;
